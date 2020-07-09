@@ -1,0 +1,23 @@
+{
+  "name": "node-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gin-vtc@github.com/gin-vtc/node-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gin-vtc/node-api/issues"
+  },
+  "homepage": "https://github.com/gin-vtc/node-api#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
