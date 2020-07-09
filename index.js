@@ -166,6 +166,17 @@ app.get('/user', (req, res) => {
         res.status(200).json(userDB[x])
     }
 });
+app.get('/userList', (req, res) => {
+    userDB = dbFunc.getJson('user')
+
+    for (x in userDB) {
+        delete userDB[x].password
+    }
+
+    res.status(200).json(userDB)
+
+})
+;
 app.post('/user', (req, res) => {
     const {user, password, name} = req.query
 
