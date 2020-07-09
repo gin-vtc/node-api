@@ -9,6 +9,107 @@ app.get('/', (req, res) => {
     res.sendStatus(200)
     res.send('ok');
 });
+// つぶやく
+app.get('/statusList', (req, res) => {
+    list = dbFunc.getJson('status')
+    list ? res.status(200).json(list) : res.sendStatus(500)
+})
+app.post('/status', (req, res) => {
+    const {id, status} = req.query
+
+    let sid = ''
+    do {
+        sid = dbFunc.makeid(15)
+    } while (!dbFunc.checkId('status', sid));
+    //　同じIDを回避する
+
+
+    const statusCode = dbFunc.appendJson('status', {id: sid, user: id, status, time: Math.floor(Date.now() / 1000)})
+    res.sendStatus(statusCode)
+
+})
+app.put('/status', (req, res) => {
+    const {id, status} = req.query
+    let statusDb = dbFunc.getJson('status')
+    for (x in statusDb) {
+        if (statusDb[x].id === id) {
+            statusDb[x].status = status
+            statusDb[x].time = Math.floor(Date.now() / 1000);
+            const statusCode = dbFunc.updateDb('status', statusDb)
+            res.sendStatus(statusCode)
+        }
+    }
+    res.sendStatus(401)
+})
+app.delete('/status', (req, res) => {
+    const {id, status} = req.query
+    let statusDb = dbFunc.getJson('status')
+    for (x in statusDb) {
+        if (statusDb[x] && statusDb[x].id === id) {
+            delete statusDb[x]
+            const statusCode = dbFunc.updateDb('status', statusDb)
+            res.sendStatus(statusCode)
+        }
+    }
+    res.sendStatus(401)
+})
+
+// コメント
+app.get('/comment', (req, res) => {
+    const {status} = req.query
+    list = dbFunc.getJson('comment')
+    final = []
+    if (list) {
+        for (x in list) {
+            if (list[x].statusId = status) {
+                final.push(list[x])
+            }
+        }
+        res.status(200).json(final)
+    } else {
+        res.sendStatus(500)
+    }
+})
+app.post('/comment', (req, res) => {
+    const {statusId, comment} = req.query
+
+    let cid = ''
+    do {
+        sid = dbFunc.makeid(15)
+    } while (!dbFunc.checkId('comment', cid));
+    //　同じIDを回避する
+
+
+    const statusCode = dbFunc.appendJson('comment', {id: cid, statusId, comment, time: Math.floor(Date.now() / 1000)})
+    res.sendStatus(statusCode)
+
+})
+app.put('/comment', (req, res) => {
+    const {id, comment} = req.query
+    let db = dbFunc.getJson('comment')
+    for (x in db) {
+        if (db[x].id === id) {
+            db[x].comment = comment
+            db[x].time = Math.floor(Date.now() / 1000);
+            const statusCode = dbFunc.updateDb('comment', db)
+            res.sendStatus(statusCode)
+        }
+    }
+    res.sendStatus(401)
+})
+app.delete('/comment', (req, res) => {
+    const {id, comment} = req.query
+    let db = dbFunc.getJson('comment')
+    for (x in db) {
+        if (db[x] && db[x].id === id) {
+            delete db[x]
+            const statusCode = dbFunc.updateDb('comment', db)
+            res.sendStatus(statusCode)
+        }
+    }
+    res.sendStatus(401)
+})
+
 
 // ログイン
 app.get('/login', (req, res) => {
@@ -51,7 +152,7 @@ app.post('/user', (req, res) => {
     let id = ''
     do {
         id = dbFunc.makeid(15)
-    } while (dbFunc.makeid('user', id));
+    } while (!dbFunc.checkId('user', id));
     //　同じIDを回避する
 
 
@@ -67,13 +168,13 @@ app.put('/user', (req, res) => {
     userDB = dbFunc.getJson('user')
     for (x in userDB) {
         if (userDB[x].user === user && userDB[x].password === password) {
-            if(newPwd){
+            if (newPwd) {
                 userDB[x].password = newPwd
             }
-            if(newName){
+            if (newName) {
                 userDB[x].name = newName
             }
-           const status =  dbFunc.updateDb('user',userDB)
+            const status = dbFunc.updateDb('user', userDB)
             res.sendStatus(status)
         }
     }

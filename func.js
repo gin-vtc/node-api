@@ -22,7 +22,7 @@ module.exports = {
         let db = fs.readFileSync('db/' + dbFile + '.json');
         let dbData = JSON.parse(db);
         for (const x in dbData){
-            if(data.id === id){
+            if(dbData[x].id === id){
                 return false
             }
         }
