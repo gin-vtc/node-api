@@ -19,6 +19,14 @@ app.use(function (req, res, next) {
     // to the API (e.g. in case you use sessions)
     res.setHeader('Access-Control-Allow-Credentials', true);
 
+    var _send = res.send;
+    var sent = false;
+    res.send = function(data){
+        if(sent) return;
+        _send.bind(res)(data);
+        sent = true;
+    };
+
     // Pass to next layer of middleware
     next();
 });
@@ -123,19 +131,6 @@ app.post('/comment', (req, res) => {
     res.sendStatus(statusCode)
 
 })
-// app.put('/comment', (req, res) => {
-//     const {id, comment} = req.query
-//     let db = dbFunc.getJson('comment')
-//     for (x in db) {
-//         if (db[x].id === id) {
-//             db[x].comment = comment
-//             db[x].time = Math.floor(Date.now() / 1000);
-//             const statusCode = dbFunc.updateDb('comment', db)
-//             res.sendStatus(statusCode)
-//         }
-//     }
-//     res.sendStatus(401)
-// })
 app.delete('/comment', (req, res) => {
     const {id, comment} = req.query
     let db = dbFunc.getJson('comment')
@@ -152,6 +147,7 @@ app.delete('/comment', (req, res) => {
 
 // ログイン
 app.get('/login', (req, res) => {
+    let sent = false
     const {user, password} = req.query
     userDB = dbFunc.getJson('user')
     console.log(user)
@@ -161,11 +157,12 @@ app.get('/login', (req, res) => {
         for (let x in userDB) {
             if (userDB[x].user === user && userDB[x].password === password) {
                 res.status(200).json(userDB[x])
+                sent = true
             }
         }
-        res.sendStatus(status)
+        if(!sent) res.sendStatus(status)
     } else {
-        res.sendStatus(500)
+        if(!sent)  res.sendStatus(500)
     }
 });
 app.get('/user', (req, res) => {
