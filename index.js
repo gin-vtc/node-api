@@ -44,7 +44,7 @@ app.post('/status', (req, res) => {
     //　同じIDを回避する
 
 
-    const statusCode = dbFunc.appendJson('status', {id: sid, user: id, status, time: Math.floor(Date.now() / 1000)})
+    const statusCode = dbFunc.appendJson('status', {id: sid, user: id, status:status, time: Math.floor(Date.now() / 1000)})
     res.sendStatus(statusCode)
 
 })
@@ -52,7 +52,7 @@ app.put('/status', (req, res) => {
     const {id, status} = req.query
     let statusDb = dbFunc.getJson('status')
     for (x in statusDb) {
-        if (statusDb[x].id === id) {
+        if (statusDb[x] && statusDb[x].id === id) {
             statusDb[x].status = status
             statusDb[x].time = Math.floor(Date.now() / 1000);
             const statusCode = dbFunc.updateDb('status', statusDb)
@@ -95,7 +95,7 @@ app.post('/comment', (req, res) => {
 
     let cid = ''
     do {
-        sid = dbFunc.makeid(15)
+        cid = dbFunc.makeid(15)
     } while (!dbFunc.checkId('comment', cid));
     //　同じIDを回避する
 
