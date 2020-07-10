@@ -44,7 +44,12 @@ app.post('/status', (req, res) => {
     //　同じIDを回避する
 
 
-    const statusCode = dbFunc.appendJson('status', {id: sid, user: id, status:status, time: Math.floor(Date.now() / 1000)})
+    const statusCode = dbFunc.appendJson('status', {
+        id: sid,
+        user: id,
+        status: status,
+        time: Math.floor(Date.now() / 1000)
+    })
     res.sendStatus(statusCode)
 
 })
@@ -77,11 +82,19 @@ app.delete('/status', (req, res) => {
 // コメント
 app.get('/comment', (req, res) => {
     const {status} = req.query
-    list = dbFunc.getJson('comment')
-    final = []
+    let list = dbFunc.getJson('comment')
+    let statusList = dbFunc.getJson('status')
+    let final = []
+    let user =""
+    for (s in statusList){
+        if(statusList[s].id ===status){
+            user = statusList[s].user
+        }
+    }
     if (list) {
         for (x in list) {
-            if (list[x].statusId = status) {
+            if (list[x] && list[x].statusId === status) {
+                list[x].user = user
                 final.push(list[x])
             }
         }
@@ -99,24 +112,30 @@ app.post('/comment', (req, res) => {
     } while (!dbFunc.checkId('comment', cid));
     //　同じIDを回避する
 
-
-    const statusCode = dbFunc.appendJson('comment', {id: cid, statusId, comment, time: Math.floor(Date.now() / 1000)})
+    const cmData = {
+        id: cid,
+        statusId: statusId,
+        comment: comment,
+        time: Math.floor(Date.now() / 1000)
+    }
+    console.log(cmData)
+    const statusCode = dbFunc.appendJson('comment', cmData)
     res.sendStatus(statusCode)
 
 })
-app.put('/comment', (req, res) => {
-    const {id, comment} = req.query
-    let db = dbFunc.getJson('comment')
-    for (x in db) {
-        if (db[x].id === id) {
-            db[x].comment = comment
-            db[x].time = Math.floor(Date.now() / 1000);
-            const statusCode = dbFunc.updateDb('comment', db)
-            res.sendStatus(statusCode)
-        }
-    }
-    res.sendStatus(401)
-})
+// app.put('/comment', (req, res) => {
+//     const {id, comment} = req.query
+//     let db = dbFunc.getJson('comment')
+//     for (x in db) {
+//         if (db[x].id === id) {
+//             db[x].comment = comment
+//             db[x].time = Math.floor(Date.now() / 1000);
+//             const statusCode = dbFunc.updateDb('comment', db)
+//             res.sendStatus(statusCode)
+//         }
+//     }
+//     res.sendStatus(401)
+// })
 app.delete('/comment', (req, res) => {
     const {id, comment} = req.query
     let db = dbFunc.getJson('comment')
@@ -199,6 +218,7 @@ app.put('/user', (req, res) => {
     userDB = dbFunc.getJson('user')
     for (x in userDB) {
         if (userDB[x].user === user && userDB[x].password === password) {
+            console.log("Found")
             if (newPwd) {
                 userDB[x].password = newPwd
             }
